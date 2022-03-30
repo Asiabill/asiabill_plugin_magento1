@@ -1,0 +1,16 @@
+.asiabill-elements{
+    margin-left: 20px;
+    width: 60%;
+    min-width: 330px;
+}
+
+#asiabill-card-errors{
+    border: 1px hsla(0,100%,50%,0.5) dashed;
+    padding: 5px 1em;
+    color: #D20;
+    height: auto;
+    margin: 0.5em auto 1em;
+}
+.hide{
+    display: none;
+}

@@ -1,0 +1,17 @@
+<script>
+<?php if ($this->hasBillingAddress()): ?>
+asiabill.billingAddress = <?php echo json_encode($this->getBillingAddress()); ?>;
+<?php endif; ?>
+
+asiabill.apiToken = '<?php echo $this->getToken()?>';
+asiabill.mode = '<?php echo $this->getMode() == 'test'?'uat':'pro' ?>';
+asiabill.layout.pageMode = '<?php echo $this->getStyle()?>';
+if( asiabill.layout.pageMode === 'inner' ){
+    asiabill.layout.style.frameMaxHeight = 44
+}else {
+    asiabill.layout.style.frameMaxHeight = 100
+}
+
+initAsiabil();
+
+</script>

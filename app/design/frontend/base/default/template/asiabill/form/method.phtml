@@ -1,0 +1,39 @@
+
+<?php
+$code = $this->getMethodCode();
+
+echo $this->getLayout()->createBlock('asiabill_payments/form_initJs')->toHtml();
+
+?>
+
+<fieldset class="form-divst">
+    <div id="payment_form_<?php echo $code ?>" style="display:none">
+
+        <?php if ($this->checkMode() == '2'){?>
+        <div>
+            <?php echo $this->__('You will be redirected to creditcard website when you place an order.') ?>
+        </div>
+        <?php }else{ ?>
+
+        <div>
+            <div class="asiabill-elements">
+                <?php echo $this->__('Enter your card details:') ?>
+            </div>
+
+            <div class="asiabill-elements">
+                <div id="asiabill-card-form" class="asiabill-elements-block">
+                    <div id="card-element" class="ab-elemen">
+                        <!-- Asiabill Element will be inserted here. -->
+                    </div>
+                </div>
+            </div>
+
+            <div class="asiabill-elements">
+                <div id="asiabill-card-errors" class="hide"></div>
+            </div>
+        </div>
+
+        <?php } ?>
+
+    </div>
+</fieldset>

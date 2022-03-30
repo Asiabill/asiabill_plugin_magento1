@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<layout version="0.1.0">
+    <default>
+        <reference name="head">
+            <action method="addItem">
+                <type>skin_js</type>
+                <name>asiabill/js/asiabill_payment.js</name>
+            </action>
+            <action method="addItem">
+                <type>skin_css</type>
+                <name>asiabill/css/asiabill_style.css</name>
+            </action>
+        </reference>
+
+    </default>
+</layout>
