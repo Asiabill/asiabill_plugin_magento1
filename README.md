@@ -5,7 +5,7 @@ Asiabill Magento1 支付插件
 插件安装
 -
 
-1、把app和skin两个目录上传到站点更目录。
+1、把app和skin两个目录上传到站点根目录。
 
 2、清除magento缓存：System -> Cache Management
 
