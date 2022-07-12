@@ -144,8 +144,8 @@ class Asiabill_Payments_Model_Payment extends Mage_Payment_Model_Method_Abstract
             }
             $goods_detail_2[] = [
                 'goodstitle' => htmlspecialchars($item->getName()),
-                'goodscount' => $item->getPrice(),
-                'goodsprice' => (int)$item->getQtyOrdered()
+                'goodscount' => (int)$item->getQtyOrdered(),
+                'goodsprice' => $item->getPrice()
             ];
             $i++;
         }
