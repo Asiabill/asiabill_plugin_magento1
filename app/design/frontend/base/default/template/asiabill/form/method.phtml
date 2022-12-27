@@ -2,8 +2,9 @@
 <?php
 $code = $this->getMethodCode();
 
-echo $this->getLayout()->createBlock('asiabill_payments/form_initJs')->toHtml();
-
+if( $this->checkMode() == '1' ) {
+    echo $this->getLayout()->createBlock('asiabill_payments/form_initJs')->toHtml();
+}
 ?>
 
 <fieldset class="form-divst">
