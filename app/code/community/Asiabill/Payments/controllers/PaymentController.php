@@ -55,6 +55,36 @@ class Asiabill_Payments_PaymentController extends Mage_Core_Controller_Front_Act
 
     }
 
+    public function resultAction(){
+
+        if ($this->model->_asiabill->verification()){
+
+            if( $this->data['orderStatus'] == 'fail' ){
+                $redirect = 'checkout/cart';
+                Mage::getSingleton('core/session')->addError($this->data['orderInfo']);
+            }else{
+                $redirect = 'checkout/onepage/success';
+                Mage::getSingleton('core/session')->addSuccess($this->data['orderInfo']);
+            }
+            //$this->setOrderStatus();
+            return $this->_redirect($redirect);
+
+        }
+        return $this->_redirect('/index');
+    }
+
+    public function callbackAction(){
+        if( $this->model->_asiabill->verification() ){
+            $this->data = $this->model->_asiabill->getWebhookData()['data'];
+
+            $this->setOrderStatus();
+            echo 'success';
+            exit();
+        }
+        echo 'error';
+        exit();
+    }
+
     protected function setOrderStatus(){
 
         $order =  Mage::getModel('sales/order')->loadByIncrementId($this->data['orderNo']);

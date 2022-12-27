@@ -2,7 +2,7 @@
 <config>
     <modules>
         <Asiabill_Payment>
-            <version>1.0.0</version>
+            <version>1.2.0</version>
         </Asiabill_Payment>
     </modules>
     <global>
@@ -60,13 +60,13 @@
         </layout>
 
         <routers>
-            <creditcard>
+            <asiabill_payments>
                 <use>standard</use>
                 <args>
                     <module>Asiabill_Payments</module>
                     <frontName>asiabill</frontName>
                 </args>
-            </creditcard>
+            </asiabill_payments>
         </routers>
 
     </frontend>

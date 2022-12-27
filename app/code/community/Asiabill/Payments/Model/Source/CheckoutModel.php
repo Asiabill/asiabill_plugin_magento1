@@ -9,10 +9,10 @@ class Asiabill_Payments_Model_Source_CheckoutModel
                 'value' => '1',
                 'label' => Mage::helper('asiabill_payments')->__('In-page Checkout')
             ),
-//            array(
-//                'value' => '2',
-//                'label' => Mage::helper('asiabill_payments')->__('Hosted Checkout')
-//            ),
+            array(
+                'value' => '2',
+                'label' => Mage::helper('asiabill_payments')->__('Hosted Checkout')
+            ),
         );
     }
 }

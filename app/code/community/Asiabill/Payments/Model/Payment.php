@@ -3,6 +3,8 @@
 ini_set("display_errors", "on");
 error_reporting(E_ALL);
 
+include_once __DIR__."/../classes/AsiabillIntegration.php";
+
 class Asiabill_Payments_Model_Payment extends Mage_Payment_Model_Method_Abstract
 {
 
@@ -20,6 +22,7 @@ class Asiabill_Payments_Model_Payment extends Mage_Payment_Model_Method_Abstract
     protected $_canUseForMultishipping  = false;
     protected $_order                   = null;
     protected $_helper = null;
+    public $_asiabill;
 
     public $curl;
     public $mode;
@@ -28,9 +31,12 @@ class Asiabill_Payments_Model_Payment extends Mage_Payment_Model_Method_Abstract
 
     public function __construct()
     {
+        parent::__construct();
         $this->curl = new Varien_Http_Adapter_Curl();
         $this->mode = $this->getConfigData('mode');
         $this->key = $this->mode == 'test'? $this->getConfigData('test_signkey'): $this->getConfigData('signkey');
+        $gateway_account = $this->getGatewayAccount();
+        $this->_asiabill = new asiabill\Classes\AsiabillIntegration($this->mode,$gateway_account['gatewayNo'],$this->key);
         $this->_helper = Mage::helper('asiabill_payments');
     }
 
@@ -61,16 +67,67 @@ class Asiabill_Payments_Model_Payment extends Mage_Payment_Model_Method_Abstract
 
             $parameter = $this->checkConfirmParameter();
 
-            $api = new Asiabill_Payments_Helper_Api($this->mode);
-
             try{
-                $res = $api->request('confirmCharge',$parameter,'POST',$this->getToken());
 
-                if($res['code'] != '0'){ //当掉交易
-                    Mage::throwException($res['message']);
+                if ( $this->getConfigData('checkout_model') == '1' ){
+                    $api = new Asiabill_Payments_Helper_Api($this->mode);
+
+                    $res = $api->request('confirmCharge',$parameter,'POST',$this->getToken());
+
+                    if($res['code'] != '0'){ //当掉交易
+                        Mage::throwException($res['message']);
+                    }
+
+                    Mage::getModel('core/session')->setData('asiabillResult',$res['data']);
+                }else{
+
+
+                    foreach( $parameter['goodsDetail'] as $item ){
+                        $parameter['goodsDetails'][] = [
+                            'goodsCount' => $item['goodscount'],
+                            'goodsPrice' => $item['goodsprice'],
+                            'goodsTitle' => $item['goodstitle']
+                        ];
+                    }
+                    unset($parameter['goodsDetail']);
+                    $parameter['billingAddress'] = [
+                        'address' => $parameter['shipping']['address']['line1'].' '.$parameter['shipping']['address']['line2'],
+                        'city' => $parameter['shipping']['address']['city'],
+                        'country' => $parameter['shipping']['address']['country'],
+                        'firstName' =>  $parameter['shipping']['firstName'],
+                        'lastName' =>  $parameter['shipping']['lastName'],
+                        'phone' => $parameter['shipping']['phone'],
+                        'state' => $parameter['shipping']['address']['state'],
+                        'zip' => $parameter['shipping']['address']['postalCode'],
+                        'email' => $parameter['shipping']['email'],
+                    ];
+                    unset($parameter['shipping']);
+                    $billing = $this->_helper->getAddress();
+                    $parameter['deliveryAddress'] = [
+                        'shipAddress' => $billing['address']['line1'].' '.$billing['address']['line2'],
+                        'shipCity' => $billing['address']['city'],
+                        'shipCountry' => $billing['address']['country'],
+                        'shipFirstName' =>  $billing['firstName'],
+                        'shipLastName' =>  $billing['lastName'],
+                        'shipPhone' => $billing['phone'],
+                        'shipState' => $billing['address']['state'],
+                        'shipZip' => $billing['address']['postalCode'],
+                    ];
+
+                    $parameter['returnUrl'] = Mage::getUrl( 'asiabill/payment/result' , array( '_secure' => true ));
+                    $parameter['callbackUrl'] = Mage::getUrl( 'asiabill/payment/callback' , array( '_secure' => true ));
+
+                    $res = $this->_asiabill->request('checkoutPayment',['body' =>
+                        $parameter
+                    ]);
+
+                    if( $res['code'] != '0000' ){
+                        Mage::throwException($res['message']);
+                    }
+
+                    Mage::getModel('core/session')->setData('asiabillResult',$res['data']);
+
                 }
-
-                Mage::getModel('core/session')->setData('asiabillResult',$res['data']);
 
             }catch (\Exception $e){
                 $message = $e->getMessage();
@@ -91,12 +148,12 @@ class Asiabill_Payments_Model_Payment extends Mage_Payment_Model_Method_Abstract
     {
         $data = Mage::getModel('core/session')->getData('asiabillResult');
 
-
-
         if( empty($data) ){
             $redirect = Mage::getBaseUrl();
         }else if( $data['threeDsType'] == 1 && !empty($data['threeDsUrl']) ){ // 3D交易
             $redirect = $data['threeDsUrl'];
+        }elseif( isset($data['redirectUrl']) ){
+            $redirect = $data['redirectUrl'];
         }else{
             $redirect = Mage::getUrl('asiabill/payment/return').'?'.http_build_query($data);
         }
@@ -122,7 +179,7 @@ class Asiabill_Payments_Model_Payment extends Mage_Payment_Model_Method_Abstract
             'webSite' => Mage::getBaseUrl(),
         ]);
 
-        $parameter['signInfo'] = $this->getConfirmSign($parameter,$this->_key);
+        $parameter['signInfo'] = $this->getConfirmSign($parameter);
 
         return $parameter;
 
@@ -135,6 +192,7 @@ class Asiabill_Payments_Model_Payment extends Mage_Payment_Model_Method_Abstract
         $i = 0;
 
         foreach ($this->_order->getAllItems() as $item){
+
             if( $i < 10 ){
                 $goods_detail_1[] = [
                     'productName' => htmlspecialchars($item->getName()),
@@ -144,12 +202,11 @@ class Asiabill_Payments_Model_Payment extends Mage_Payment_Model_Method_Abstract
             }
             $goods_detail_2[] = [
                 'goodstitle' => htmlspecialchars($item->getName()),
-                'goodscount' => (int)$item->getQtyOrdered(),
-                'goodsprice' => $item->getPrice()
+                'goodsprice' => $item->getPrice(),
+                'goodscount' => (int)$item->getQtyOrdered()
             ];
             $i++;
         }
-
 
         return [
             'orderNo' => $this->_order->getRealOrderId(),
@@ -238,13 +295,16 @@ class Asiabill_Payments_Model_Payment extends Mage_Payment_Model_Method_Abstract
         $order_status = false;
         switch ( $code ){
             case 1:
+            case 'success':
                 $order_status = $this->getConfigData('success_status');;
                 break;
             case -1:
             case -2:
+            case 'pending':
                 $order_status = $this->getConfigData('pending_status');
                 break;
             case 0:
+            case 'fail':
                 if( @substr($_REQUEST['orderInfo'],0,5) == 'I0061' ){
                     // 重复支付订单
                     $order_status = $this->getConfigData('success_status');
