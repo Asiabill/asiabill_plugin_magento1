@@ -23,6 +23,7 @@ Asiabill Magento1 支付插件
 * Mer No、Gateway No、Sign Key：账户信息，非测试模式下使用
 * Checkout Model：支付模式
   * In-page Checkout ：内嵌表单模式
+  * Hosted Checkout ：托管支付模式
 * Elements Style：内嵌表单样式，单行/双行
 * Order status when success：交易成功更新订单状态
 * Order status when failure：交易失败更新订单状态
