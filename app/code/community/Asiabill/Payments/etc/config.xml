@@ -2,7 +2,7 @@
 <config>
     <modules>
         <Asiabill_Payment>
-            <version>1.2.0</version>
+            <version>1.3.0</version>
         </Asiabill_Payment>
     </modules>
     <global>
@@ -37,6 +37,30 @@
                 <sort_order>1</sort_order>
                 <payment_action>authorize</payment_action>
             </asiabill_creditcard>
+            <asiabill_ideal>
+                <model>asiabill_payments/ideal</model>
+                <title>Ideal</title>
+                <test_gateway_no>12246002</test_gateway_no>
+                <test_signkey>12H4567r</test_signkey>
+                <success_status>processing</success_status>
+                <failure_status>closed</failure_status>
+                <pending_status>holded</pending_status>
+                <allowspecific>0</allowspecific>
+                <sort_order>2</sort_order>
+                <payment_action>authorize</payment_action>
+            </asiabill_ideal>
+            <asiabill_klarna>
+                <model>asiabill_payments/klarna</model>
+                <title>Klarna</title>
+                <test_gateway_no>12246002</test_gateway_no>
+                <test_signkey>12H4567r</test_signkey>
+                <success_status>processing</success_status>
+                <failure_status>closed</failure_status>
+                <pending_status>holded</pending_status>
+                <allowspecific>0</allowspecific>
+                <sort_order>3</sort_order>
+                <payment_action>authorize</payment_action>
+            </asiabill_klarna>
         </payment>
     </default>
     <adminhtml>

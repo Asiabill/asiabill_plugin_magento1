@@ -10,6 +10,7 @@ class Asiabill_Payments_Model_Payment extends Mage_Payment_Model_Method_Abstract
 
     protected $_code  = 'asiabill_creditcard';
     protected $_formBlockType = 'asiabill_payments/form_method';
+    protected $_paymentMethod = 'Credit Card';
     protected $_isGateway               = false;
     protected $_isInitializeNeeded      = true;
     protected $_canAuthorize            = false;
@@ -173,6 +174,7 @@ class Asiabill_Payments_Model_Payment extends Mage_Payment_Model_Method_Abstract
             'ip' => $this->_helper->getCusIp(),
             'returnUrl' => Mage::getUrl( 'asiabill/payment/return' , array( '_secure' => true )),
             'callbackUrl' => Mage::getUrl( 'asiabill/payment/webhook' , array( '_secure' => true )),
+            'paymentMethod' => $this->_paymentMethod,
             'platform' => 'Magento1',
             'isMobile' => $this->_helper->isMobile(),
             'tradeType' => 'web',
