@@ -91,29 +91,32 @@ class Asiabill_Payments_Model_Payment extends Mage_Payment_Model_Method_Abstract
                         ];
                     }
                     unset($parameter['goodsDetail']);
+
+                    $billing = $this->_helper->getAddress();
+
                     $parameter['billingAddress'] = [
-                        'address' => $parameter['shipping']['address']['line1'].' '.$parameter['shipping']['address']['line2'],
-                        'city' => $parameter['shipping']['address']['city'],
-                        'country' => $parameter['shipping']['address']['country'],
-                        'firstName' =>  $parameter['shipping']['firstName'],
-                        'lastName' =>  $parameter['shipping']['lastName'],
-                        'phone' => $parameter['shipping']['phone'],
-                        'state' => $parameter['shipping']['address']['state'],
-                        'zip' => $parameter['shipping']['address']['postalCode'],
-                        'email' => $parameter['shipping']['email'],
+                        'address' => $billing['address']['line1'].' '.$billing['address']['line2'],
+                        'city' => $billing['address']['city'],
+                        'country' => $billing['address']['country'],
+                        'firstName' =>  $billing['firstName'],
+                        'lastName' =>  $billing['lastName'],
+                        'phone' => $billing['phone'],
+                        'state' => $billing['address']['state'],
+                        'zip' => $billing['address']['postalCode'],
+                        'email' => $billing['email'],
+                    ];
+
+                    $parameter['deliveryAddress'] = [
+                        'shipAddress' => $parameter['shipping']['address']['line1'].' '.$parameter['shipping']['address']['line2'],
+                        'shipCity' => $parameter['shipping']['address']['city'],
+                        'shipCountry' => $parameter['shipping']['address']['country'],
+                        'shipFirstName' =>  $parameter['shipping']['firstName'],
+                        'shipLastName' =>  $parameter['shipping']['lastName'],
+                        'shipPhone' => $parameter['shipping']['phone'],
+                        'shipState' => $parameter['shipping']['address']['state'],
+                        'shipZip' => $parameter['shipping']['address']['postalCode'],
                     ];
                     unset($parameter['shipping']);
-                    $billing = $this->_helper->getAddress();
-                    $parameter['deliveryAddress'] = [
-                        'shipAddress' => $billing['address']['line1'].' '.$billing['address']['line2'],
-                        'shipCity' => $billing['address']['city'],
-                        'shipCountry' => $billing['address']['country'],
-                        'shipFirstName' =>  $billing['firstName'],
-                        'shipLastName' =>  $billing['lastName'],
-                        'shipPhone' => $billing['phone'],
-                        'shipState' => $billing['address']['state'],
-                        'shipZip' => $billing['address']['postalCode'],
-                    ];
 
                     $parameter['returnUrl'] = Mage::getUrl( 'asiabill/payment/result' , array( '_secure' => true ));
                     $parameter['callbackUrl'] = Mage::getUrl( 'asiabill/payment/callback' , array( '_secure' => true ));
