@@ -59,7 +59,10 @@ class Asiabill_Payments_PaymentController extends Mage_Core_Controller_Front_Act
 
         if ($this->model->_asiabill->verification()){
 
-            if( $this->data['orderStatus'] == 'fail' ){
+            $this->data = $_GET;
+            $this->setOrderStatus();
+
+            if( $this->data['orderStatus'] == 'fail' || $this->data['orderStatus'] == '0' ){
                 $redirect = 'checkout/cart';
                 Mage::getSingleton('core/session')->addError($this->data['orderInfo']);
             }else{
@@ -95,7 +98,7 @@ class Asiabill_Payments_PaymentController extends Mage_Core_Controller_Front_Act
 
         $order_status = $order->getStatus();
 
-        if( in_array($order_status,['processing','complete','closed']) ){
+        if( in_array($order_status,['processing','complete']) ){
             return false;
         }
 

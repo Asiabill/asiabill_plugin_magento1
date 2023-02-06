@@ -215,6 +215,7 @@ class AsiabillIntegration
             return @$signInfo == strtoupper($this->signInfo($data));
         }
 
+
         // webhook 接收验证签名
         if( $_SERVER['REQUEST_METHOD'] == 'POST' ){
 

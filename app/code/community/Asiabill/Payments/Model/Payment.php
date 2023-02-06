@@ -23,6 +23,7 @@ class Asiabill_Payments_Model_Payment extends Mage_Payment_Model_Method_Abstract
     protected $_canUseForMultishipping  = false;
     protected $_order                   = null;
     protected $_helper = null;
+    protected $_controller = 'payment';
     public $_asiabill;
 
     public $curl;
@@ -118,8 +119,8 @@ class Asiabill_Payments_Model_Payment extends Mage_Payment_Model_Method_Abstract
                     ];
                     unset($parameter['shipping']);
 
-                    $parameter['returnUrl'] = Mage::getUrl( 'asiabill/payment/result' , array( '_secure' => true ));
-                    $parameter['callbackUrl'] = Mage::getUrl( 'asiabill/payment/callback' , array( '_secure' => true ));
+                    $parameter['returnUrl'] = Mage::getUrl( 'asiabill/'. $this->_controller .'/result' , array( '_secure' => true ));
+                    $parameter['callbackUrl'] = Mage::getUrl( 'asiabill/'. $this->_controller .'/callback' , array( '_secure' => true ));
 
                     $res = $this->_asiabill->request('checkoutPayment',['body' =>
                         $parameter
@@ -175,8 +176,8 @@ class Asiabill_Payments_Model_Payment extends Mage_Payment_Model_Method_Abstract
         $parameter = array_merge($gateway_account,$order_info,['shipping'=>$shipping],[
             'customerPaymentMethodId' => $info->getAdditionalInformation('cc_asiabill_pmid'),
             'ip' => $this->_helper->getCusIp(),
-            'returnUrl' => Mage::getUrl( 'asiabill/payment/return' , array( '_secure' => true )),
-            'callbackUrl' => Mage::getUrl( 'asiabill/payment/webhook' , array( '_secure' => true )),
+            'returnUrl' => Mage::getUrl( 'asiabill/'. $this->_controller .'/return' , array( '_secure' => true )),
+            'callbackUrl' => Mage::getUrl( 'asiabill/'. $this->_controller .'/webhook' , array( '_secure' => true )),
             'paymentMethod' => $this->_paymentMethod,
             'platform' => 'Magento1',
             'isMobile' => $this->_helper->isMobile(),
